@@ -16,6 +16,7 @@ public class ProximitySensorController implements SensorEventListener {
     private FlashlightController flashlightController;
     private ProximitySensorListener listener;
 
+
     public ProximitySensorController(Context context) {
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);

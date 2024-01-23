@@ -1,5 +1,6 @@
 package com.example.a1_hello_sensor;
 
+import android.graphics.Color;
 import android.view.View;
 import com.google.android.material.chip.Chip;
 import android.widget.TextView;
@@ -8,17 +9,19 @@ import android.widget.ProgressBar;
 public class UIController {
 
     private Chip activateProximityChip;
-    private TextView proximityTextView;
     private Chip activateAccelerometerChip;
+    private TextView proximityTextView;
     private TextView accelerometerTextView;
+    private TextView square;
     private ProgressBar shakeMeter;
-
     private ProximitySensorController.ProximitySensorListener proximitySensorListener;
     private AccelerometerSensorController.AccelerometerSensorListener accelerometerSensorListener;
 
     public UIController(View rootView) {
         activateProximityChip = rootView.findViewById(R.id.activateProximityChip);
         proximityTextView = rootView.findViewById(R.id.proximityTextView);
+
+        square = rootView.findViewById(R.id.square);
 
         activateAccelerometerChip = rootView.findViewById(R.id.activateAccelerometerChip);
         accelerometerTextView = rootView.findViewById(R.id.accelerometerTextView);
@@ -84,7 +87,6 @@ public class UIController {
     public void onAccelerometerChanged(double change) {
         updateAccelerometerText(change);
         shakeMeter.setProgress((int) change);
-
     }
 
     private void updateAccelerometerText(double change) {

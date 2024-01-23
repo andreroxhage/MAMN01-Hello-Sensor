@@ -18,6 +18,9 @@ public class AccelerometerSensorController implements SensorEventListener {
     private double accelerationCurrentValue;
     private FlashlightController flashlightController;
     private Vibrator vibrator;
+    private float[] rotationMatrix = new float[9];
+    private float[] orientationValues = new float[3];
+
 
     private static final double ACCELERATION_THRESHOLD = 1.0;
     private static final long TIME_DELAY_THRESHOLD = 1000; // in milliseconds
@@ -60,23 +63,23 @@ public class AccelerometerSensorController implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
+            if (event.values != null && event.values.length >= 3) {
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
 
-            // Absolute single value for change in acceleration
-            //https://www.youtube.com/watch?v=zUzZ67grYt8
-            accelerationCurrentValue = Math.sqrt((x * x + y * y + z * z));
-            double changeAcceleration = Math.abs(accelerationCurrentValue - accelerationPreviousValue);
-            accelerationPreviousValue = accelerationCurrentValue;
+                // Absolute single value for change in acceleration
+                accelerationCurrentValue = Math.sqrt((x * x + y * y + z * z));
+                double change = Math.abs(accelerationCurrentValue - accelerationPreviousValue);
+                accelerationPreviousValue = accelerationCurrentValue;
 
-            //Toggle flashlight if acceleration is above threshold
-            // Apply a threshold, time delay, and debouncing
-            handleAccelerationChange(changeAcceleration);
+                // Toggle flashlight if acceleration is above threshold
+                handleAccelerationChange(change);
 
-            // Inform listeners
-            if (listener != null) {
-                listener.onAccelerometerChanged(changeAcceleration);
+                // Inform listeners
+                if (listener != null) {
+                    listener.onAccelerometerChanged(change);
+                }
             }
         }
     }
@@ -101,7 +104,6 @@ public class AccelerometerSensorController implements SensorEventListener {
             }
         }
     }
-
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Handle accuracy changes if needed
