@@ -5,6 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.SoundPool;
+import android.os.Vibrator;
 
 public class AccelerometerSensorController implements SensorEventListener {
 
@@ -15,15 +17,19 @@ public class AccelerometerSensorController implements SensorEventListener {
     private double accelerationPreviousValue;
     private double accelerationCurrentValue;
     private FlashlightController flashlightController;
-    private static final double ACCELERATION_THRESHOLD = 2.0;
-    private static final long TIME_DELAY_THRESHOLD = 2000; // in milliseconds
+    private Vibrator vibrator;
+
+    private static final double ACCELERATION_THRESHOLD = 1.0;
+    private static final long TIME_DELAY_THRESHOLD = 1000; // in milliseconds
     private long lastToggleTimestamp = 0;
+    private boolean isFirstShake = true; // Prevents bug of having light turned on when activating accelerometer the first time
 
 
     public AccelerometerSensorController(Context context) {
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         flashlightController = new FlashlightController(context);
+        vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     public void registerListener(AccelerometerSensorListener listener) {
@@ -81,12 +87,17 @@ public class AccelerometerSensorController implements SensorEventListener {
 
             // Apply a time delay
             if (currentTimestamp - lastToggleTimestamp > TIME_DELAY_THRESHOLD) {
-                // Debouncing - only toggle if the flashlight state is different
-                flashlightController.toggleFlashlight();
+                // Only toggle if it's the first shake
+                if (isFirstShake) {
+                    isFirstShake = false;
+                } else {
+                    // Debouncing - only toggle if the flashlight state is different
+                    flashlightController.toggleFlashlight();
+                    vibrator.vibrate(200);
+                }
 
-                // Update timestamp and flashlight state
+                // Update timestamp
                 lastToggleTimestamp = currentTimestamp;
-
             }
         }
     }
