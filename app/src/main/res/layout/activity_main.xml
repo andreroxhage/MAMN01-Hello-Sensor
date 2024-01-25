@@ -40,29 +40,21 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:singleLine="false"
-                    android:text="Hello Sensor"
+                    android:text="Welcome"
                     android:textAllCaps="true"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </FrameLayout>
 
-
-            <!-- Add TabLayout -->
-
-            <!-- Add ViewPager -->
-
-
-            <!-- LinearLayout containing Chip and TextView -->
             <LinearLayout
-                android:id="@+id/proximityContainer"
+                android:id="@+id/accelerometerContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/toolbar"
                 android:orientation="vertical">
 
-                <!-- Title -->
-
+                <!-- Title for Accelerometer -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -78,7 +70,7 @@
                         android:inputType="text"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
-                        android:text="Proximity Sensor - Flashlight"
+                        android:text="Use your phone as a Spirit Level"
                         android:textAlignment="textStart"
                         android:textAllCaps="false"
                         android:textSize="20sp"
@@ -86,77 +78,10 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Instructions -->
-                <MultiAutoCompleteTextView
-                    android:id="@+id/instrucText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:background="@null"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="Place your phone near an object to turn on the flashlight. Try it out! &#10; &#10;Hint: You need to activate the proximity sensor."
-                    android:textSize="16sp" /> <!-- Set background to null to remove underline -->
-
-                <!-- Spacer -->
-
-                <!-- Chip and TextView -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/activateProximityChip"
-                        style="@style/Widget.MaterialComponents.Chip.Action"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="onActivateSensorChipClick"
-                        android:text="Activate Proximity Sensor" />
-
-                    <TextView
-                        android:id="@+id/proximityTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- LinearLayout containing Chip and TextView for Accelerometer -->
-
-            <LinearLayout
-                android:id="@+id/accelerometerContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/proximityContainer"
-                android:orientation="vertical">
-
-                <!-- Title for Accelerometer -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxBackgroundMode="none">
-
-                    <EditText
-                        android:id="@+id/accelerometerTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autoText="true"
-                        android:background="@null"
-                        android:ems="10"
-                        android:inputType="text"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:text="Accelerometer Sensor"
-                        android:textAlignment="textStart"
-                        android:textAllCaps="false"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                </com.google.android.material.textfield.TextInputLayout>
+                    app:boxBackgroundMode="none" />
 
                 <!-- Instructions for Accelerometer -->
                 <MultiAutoCompleteTextView
@@ -167,7 +92,7 @@
                     android:background="@null"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="Shake your phone to interact with the accelerometer. Try it out!"
+                    android:text="Place your phone on a plane surface to make the square turn green &#10; &#10;Move your phone carefully.  &#10; &#10;Hint: You need to activate the Accelerometer sensor."
                     android:textSize="16sp" />
 
                 <!-- Chip and TextView for Accelerometer -->
@@ -195,6 +120,31 @@
 
                 </LinearLayout>
 
+                <!-- Chip and TextView for Gyroscope -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/activateGyroscopeChip"
+                        style="@style/Widget.MaterialComponents.Chip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="onActivateGyroscopeChipClick"
+                        android:text="Activate Gyroscope Sensor" />
+
+                    <TextView
+                        android:id="@+id/gyroscopeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp" />
+
+                </LinearLayout>
+
                 <ProgressBar
                     android:id="@+id/shakeBar"
                     style="?android:attr/progressBarStyleHorizontal"
@@ -205,6 +155,15 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp" />
 
+                <TextView
+                    android:id="@+id/warningTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -212,33 +171,6 @@
                     android:orientation="vertical"
                     android:paddingTop="20dp"
                     android:paddingBottom="20dp">
-
-                    <EditText
-                        android:id="@+id/spiritTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autoText="true"
-                        android:background="@null"
-                        android:ems="10"
-                        android:inputType="text"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:text="Spirit Level"
-                        android:textAlignment="textStart"
-                        android:textAllCaps="false"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <MultiAutoCompleteTextView
-                        android:id="@+id/spiritInstrucText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:background="@null"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:text="Rotate and fixate your phone in a 90 degree angle..  &#10; &#10;Hint: You need to activate the Accelerometer sensor."
-                        android:textSize="16sp" />
 
                     <!-- Chip and TextView for Accelerometer -->
 
@@ -257,7 +189,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-
         </RelativeLayout>
     </LinearLayout>
 

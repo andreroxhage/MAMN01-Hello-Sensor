@@ -5,28 +5,21 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.SoundPool;
 import android.os.Vibrator;
+
+import com.google.android.material.snackbar.Snackbar;
 
 public class AccelerometerSensorController implements SensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
-    private boolean isSensorActivated = false;
-    private AccelerometerSensorListener listener;
+    private boolean isAccelerometerActivated = false;
+    private AccelerometerListener listener;
     private double accelerationPreviousValue;
     private double accelerationCurrentValue;
     private FlashlightController flashlightController;
     private Vibrator vibrator;
-    private float[] rotationMatrix = new float[9];
-    private float[] orientationValues = new float[3];
-
-
     private static final double ACCELERATION_THRESHOLD = 1.0;
-    private static final long TIME_DELAY_THRESHOLD = 1000; // in milliseconds
-    private long lastToggleTimestamp = 0;
-    private boolean isFirstShake = true; // Prevents bug of having light turned on when activating accelerometer the first time
-
 
     public AccelerometerSensorController(Context context) {
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -35,11 +28,11 @@ public class AccelerometerSensorController implements SensorEventListener {
         vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
-    public void registerListener(AccelerometerSensorListener listener) {
+    public void registerListener(AccelerometerListener listener) {
         this.listener = listener;
         if (accelerometerSensor != null) {
             sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            isSensorActivated = true;
+            isAccelerometerActivated = true;
             if (listener != null) {
                 listener.onAccelerometerActivated();
             }
@@ -49,15 +42,15 @@ public class AccelerometerSensorController implements SensorEventListener {
     public void unregisterListener() {
         if (accelerometerSensor != null) {
             sensorManager.unregisterListener(this);
-            isSensorActivated = false;
+            isAccelerometerActivated = false;
             if (listener != null) {
                 listener.onAccelerometerDeactivated();
             }
         }
     }
 
-    public boolean isSensorActivated() {
-        return isSensorActivated;
+    public boolean isAccelerometerActivated() {
+        return isAccelerometerActivated;
     }
 
     @Override
@@ -73,49 +66,36 @@ public class AccelerometerSensorController implements SensorEventListener {
                 double change = Math.abs(accelerationCurrentValue - accelerationPreviousValue);
                 accelerationPreviousValue = accelerationCurrentValue;
 
-                // Toggle flashlight if acceleration is above threshold
-                handleAccelerationChange(change);
 
-                // Inform listeners
+                // Inform listeners && let flashlight blink once
                 if (listener != null) {
-                    listener.onAccelerometerChanged(change);
+                    listener.onAccelerometerChanged(change, x, y);
                 }
-            }
-        }
-    }
 
-    private void handleAccelerationChange(double changeAcceleration) {
-        if (changeAcceleration > ACCELERATION_THRESHOLD) {
-            long currentTimestamp = System.currentTimeMillis();
-
-            // Apply a time delay
-            if (currentTimestamp - lastToggleTimestamp > TIME_DELAY_THRESHOLD) {
-                // Only toggle if it's the first shake
-                if (isFirstShake) {
-                    isFirstShake = false;
-                } else {
-                    // Debouncing - only toggle if the flashlight state is different
-                    flashlightController.toggleFlashlight();
+                if((int) x == 0 && (int) y == 0) {
                     vibrator.vibrate(200);
+                    flashlightController.toggleFlashlight();
+                    flashlightController.toggleFlashlight();
                 }
-
-                // Update timestamp
-                lastToggleTimestamp = currentTimestamp;
             }
         }
     }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Handle accuracy changes if needed
     }
 
     // Interface to communicate events to the UI
-    public interface AccelerometerSensorListener {
+    public interface AccelerometerListener {
         void onAccelerometerActivated();
 
         void onAccelerometerDeactivated();
 
-        void onAccelerometerChanged(double change);
+        void onAccelerometerChanged(double change, float x, float y);
     }
 
+    public boolean isSensorActivated() {
+        return isAccelerometerActivated;
+    }
 }

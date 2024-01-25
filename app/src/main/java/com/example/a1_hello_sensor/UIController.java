@@ -3,23 +3,26 @@ package com.example.a1_hello_sensor;
 import android.graphics.Color;
 import android.view.View;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.snackbar.Snackbar;
+
 import android.widget.TextView;
 import android.widget.ProgressBar;
 
 public class UIController {
 
-    private Chip activateProximityChip;
+    private Chip activateGyroscopeChip;
     private Chip activateAccelerometerChip;
-    private TextView proximityTextView;
+    private TextView gyroscopeTextView;
     private TextView accelerometerTextView;
+    private TextView warningTextView;
     private TextView square;
     private ProgressBar shakeMeter;
-    private ProximitySensorController.ProximitySensorListener proximitySensorListener;
-    private AccelerometerSensorController.AccelerometerSensorListener accelerometerSensorListener;
 
     public UIController(View rootView) {
-        activateProximityChip = rootView.findViewById(R.id.activateProximityChip);
-        proximityTextView = rootView.findViewById(R.id.proximityTextView);
+        activateGyroscopeChip = rootView.findViewById(R.id.activateGyroscopeChip);
+        gyroscopeTextView = rootView.findViewById(R.id.gyroscopeTextView);
+        warningTextView = rootView.findViewById(R.id.warningTextView);
+
 
         square = rootView.findViewById(R.id.square);
 
@@ -28,39 +31,43 @@ public class UIController {
         shakeMeter = rootView.findViewById(R.id.shakeBar);
     }
 
-    public void setProximityChipText(String text) {
-        activateProximityChip.setText(text);
+    public void setGyroscopeChipText(String text) {
+        activateGyroscopeChip.setText(text);
     }
 
     public void setAccelerometerChipText(String text) {
         activateAccelerometerChip.setText(text);
     }
 
-    public void updateProximityText(float distance) {
-        proximityTextView.setText(String.format("%.2f cm", distance));
-    }
+    public void updateGyroscopeText(float[] values) {
+        StringBuilder builder = new StringBuilder();
+        for (float value : values) {
+            builder.append(String.format("%.2f cm, ", value));
+        }
+        // Remove the trailing comma and space
+        builder.setLength(builder.length() - 2);
 
-    public void setProximityChipClickListener(View.OnClickListener clickListener) {
-        activateProximityChip.setOnClickListener(clickListener);
+        gyroscopeTextView.setText(builder.toString());
     }
 
     public void setAccelerometerChipClickListener(View.OnClickListener clickListener) {
         activateAccelerometerChip.setOnClickListener(clickListener);
     }
 
-    // Set the listener for proximity sensor events
-    public void setProximitySensorListener(ProximitySensorController.ProximitySensorListener listener) {
-        this.proximitySensorListener = listener;
+    public void setGyroscopeChipClickListener(View.OnClickListener clickListener) {
+        activateGyroscopeChip.setOnClickListener(clickListener);
     }
 
     // Notify UI about sensor activation
-    public void onProximityActivated() {
-        setProximityChipText("Deactivate Proximity Sensor");
+    public void onGyroscopeActivated() {
+        setGyroscopeChipText("Deactivate Gyroscope Sensor");
     }
 
     // Notify UI about sensor deactivation
-    public void onProximityDeactivated() {
-        setProximityChipText("Activate Proximity Sensor");
+    public void onGyroscopeDeactivated() {
+        setGyroscopeChipText("Activate Gyroscope Sensor");
+        gyroscopeTextView.setText("");
+
     }
 
     // Notify UI about sensor activation
@@ -71,26 +78,47 @@ public class UIController {
     // Notify UI about sensor deactivation
     public void onAccelerometerDeactivated() {
         setAccelerometerChipText("Activate Accelerometer Sensor");
+        accelerometerTextView.setText("");
     }
 
     // Notify UI about proximity change
-    public void onProximityChanged(float distance) {
-        updateProximityText(distance);
-    }
+    public void onGyroscopeChanged(float[] values) {
+        updateGyroscopeText(values);
 
-    // Set the listener for accelerometer sensor events
-    public void setAccelerometerSensorListener(AccelerometerSensorController.AccelerometerSensorListener listener) {
-        this.accelerometerSensorListener = listener;
+        for(float n : values) {
+            if(n > 0.5) {
+                warningTextView.setText("Slow down!");
+
+            } else {
+                warningTextView.setText("");
+            }
+        }
     }
 
     // Notify UI about accelerometer change
-    public void onAccelerometerChanged(double change) {
+    public void onAccelerometerChanged(double change, float sides, float upDown) {
         updateAccelerometerText(change);
         shakeMeter.setProgress((int) change);
+
+        // Square
+        // Assuming square is an instance of View
+        square.setRotationX(upDown * 3f);
+        square.setRotationY(sides * 3f);
+        square.setRotation(-sides);
+        square.setTranslationX(sides * -10);
+        square.setTranslationY(upDown * 10);
+
+        // Changes the color of the square if it's completely flat
+        int color = ((int) upDown == 0 && (int) sides == 0) ? Color.GREEN : Color.RED;
+        square.setBackgroundColor(color);
+
+        square.setText("up/down " + (int) upDown + "\nleft/right " + (int) sides);
+
     }
 
     private void updateAccelerometerText(double change) {
         // Assuming you have a TextView for displaying accelerometer data
         accelerometerTextView.setText(String.format("Acceleration: " + (int) change));
     }
+
 }

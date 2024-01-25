@@ -7,12 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity implements
-        ProximitySensorController.ProximitySensorListener,
-        AccelerometerSensorController.AccelerometerSensorListener {
+        AccelerometerSensorController.AccelerometerListener, GyroscopeSensorController.GyroscopeListener {
 
+    private AccelerometerSensorController accelerometerController;
+    private GyroscopeSensorController gyroscopeController;
     private UIController uiController;
-    private ProximitySensorController proximitySensorController;
-    private AccelerometerSensorController accelerometerSensorController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,22 +19,44 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         uiController = new UIController(findViewById(android.R.id.content));
-        proximitySensorController = new ProximitySensorController(this);
-        accelerometerSensorController = new AccelerometerSensorController(this);
+        gyroscopeController = new GyroscopeSensorController(this);
+        accelerometerController = new AccelerometerSensorController(this);
 
         // Set click listeners for each sensor chip
-        uiController.setProximityChipClickListener(v -> onProximitySensorChipClick(v));
-        uiController.setAccelerometerChipClickListener(v -> onAccelerometerSensorChipClick(v));
+        uiController.setGyroscopeChipClickListener(v -> onActivateGyroscopeChipClick(v));
+        uiController.setAccelerometerChipClickListener(v -> onActivateAccelerometerChipClick(v));
 
         // Set initial UI state
 
         // Register sensors if they were activated
-        if (proximitySensorController.isSensorActivated()) {
-            proximitySensorController.registerListener(this);
+        if (gyroscopeController.isSensorActivated()) {
+            gyroscopeController.registerListener(this);
         }
 
-        if (accelerometerSensorController.isSensorActivated()) {
-            accelerometerSensorController.registerListener(this);
+        if (accelerometerController.isSensorActivated()) {
+            accelerometerController.registerListener(this);
+        }
+    }
+
+    // Accelerometer sensor chip click handler
+    private void toggleAccelerometerSensor() {
+        if (accelerometerController.isAccelerometerActivated()) {
+            accelerometerController.unregisterListener();
+            Snackbar.make(getWindow().getDecorView(), "Accelerometer Sensor Deactivated", Snackbar.LENGTH_SHORT).show();
+        } else {
+            accelerometerController.registerListener(this);
+            Snackbar.make(getWindow().getDecorView(), "Accelerometer Sensor Activated", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    // Gyroscope sensor chip click handler
+    private void toggleGyroscopeSensor() {
+        if (gyroscopeController.isGyroscopeActivated()) {
+            gyroscopeController.unregisterListener();
+            Snackbar.make(getWindow().getDecorView(), "Gyroscope Sensor Deactivated", Snackbar.LENGTH_SHORT).show();
+        } else {
+            gyroscopeController.registerListener(this);
+            Snackbar.make(getWindow().getDecorView(), "Gyroscope Sensor Activated", Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -49,57 +70,33 @@ public class MainActivity extends AppCompatActivity implements
         uiController.onAccelerometerDeactivated();
     }
 
-
     @Override
-    public void onProximityActivated() {
-        uiController.onProximityActivated();
+    public void onAccelerometerChanged(double change, float x, float y) {
+        uiController.onAccelerometerChanged(change, x, y);
     }
 
     @Override
-    public void onProximityDeactivated() {
-        uiController.onProximityDeactivated();
+    public void onGyroscopeActivated() {
+        uiController.onGyroscopeActivated();
     }
 
     @Override
-    public void onAccelerometerChanged(double change) {
-        uiController.onAccelerometerChanged(change);
+    public void onGyroscopeDeactivated() {
+        uiController.onGyroscopeDeactivated();
     }
 
     @Override
-    public void onProximityChanged(float distance) {
-        uiController.onProximityChanged(distance);
+    public void onGyroscopeChanged(float[] values) {
+        uiController.onGyroscopeChanged(values);
     }
 
-    // Proximity sensor chip click handler
-    public void onProximitySensorChipClick(View view) {
-        toggleProximitySensor();
+    // Gyroscope sensor chip click handler
+    public void onActivateGyroscopeChipClick(View view) {
+        toggleGyroscopeSensor();
     }
 
     // Accelerometer sensor chip click handler
-    public void onAccelerometerSensorChipClick(View view) {
+    public void onActivateAccelerometerChipClick(View view) {
         toggleAccelerometerSensor();
     }
-
-    // Toggle the state of the proximity sensor
-    private void toggleProximitySensor() {
-        if (proximitySensorController.isSensorActivated()) {
-            proximitySensorController.unregisterListener();
-            Snackbar.make(getWindow().getDecorView(), "Proximity Sensor Deactivated", Snackbar.LENGTH_SHORT).show();
-        } else {
-            proximitySensorController.registerListener(this);
-            Snackbar.make(getWindow().getDecorView(), "Proximity Sensor Activated", Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    // Toggle the state of the accelerometer sensor
-    private void toggleAccelerometerSensor() {
-        if (accelerometerSensorController.isSensorActivated()) {
-            accelerometerSensorController.unregisterListener();
-            Snackbar.make(getWindow().getDecorView(), "Accelerometer Sensor Deactivated", Snackbar.LENGTH_SHORT).show();
-        } else {
-            accelerometerSensorController.registerListener(this);
-            Snackbar.make(getWindow().getDecorView(), "Accelerometer Sensor Activated", Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
 }
