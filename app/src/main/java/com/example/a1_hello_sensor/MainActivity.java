@@ -93,9 +93,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onGyroscopeChanged(float[] values) {
-        mp.start();
-        uiController.onGyroscopeChanged(values);
 
+        for(float n : values) {
+            if (n > 0.5) {
+                mp.start();
+            }
+        }
+        uiController.onGyroscopeChanged(values);
     }
 
     public void onActivateGyroscopeChipClick(View view) {
