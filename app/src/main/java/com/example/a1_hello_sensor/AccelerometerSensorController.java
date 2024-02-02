@@ -7,8 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Vibrator;
 
-import com.google.android.material.snackbar.Snackbar;
-
 public class AccelerometerSensorController implements SensorEventListener {
 
     private SensorManager sensorManager;
@@ -19,7 +17,6 @@ public class AccelerometerSensorController implements SensorEventListener {
     private double accelerationCurrentValue;
     private FlashlightController flashlightController;
     private Vibrator vibrator;
-    private static final double ACCELERATION_THRESHOLD = 1.0;
 
     public AccelerometerSensorController(Context context) {
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);

@@ -1,9 +1,9 @@
 package com.example.a1_hello_sensor;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity implements
@@ -12,11 +12,13 @@ public class MainActivity extends AppCompatActivity implements
     private AccelerometerSensorController accelerometerController;
     private GyroscopeSensorController gyroscopeController;
     private UIController uiController;
+    private  MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mp = MediaPlayer.create(this, R.raw.sound); // https://stackoverflow.com/questions/18459122/play-sound-on-button-click-android
 
         uiController = new UIController(findViewById(android.R.id.content));
         gyroscopeController = new GyroscopeSensorController(this);
@@ -25,8 +27,6 @@ public class MainActivity extends AppCompatActivity implements
         // Set click listeners for each sensor chip
         uiController.setGyroscopeChipClickListener(v -> onActivateGyroscopeChipClick(v));
         uiController.setAccelerometerChipClickListener(v -> onActivateAccelerometerChipClick(v));
-
-        // Set initial UI state
 
         // Register sensors if they were activated
         if (gyroscopeController.isSensorActivated()) {
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    // Update the UI on accelerometer changes
     @Override
     public void onAccelerometerActivated() {
         uiController.onAccelerometerActivated();
@@ -75,6 +76,11 @@ public class MainActivity extends AppCompatActivity implements
         uiController.onAccelerometerChanged(change, x, y);
     }
 
+    public void onActivateAccelerometerChipClick(View view) {
+        toggleAccelerometerSensor();
+    }
+
+    // Update the UI on gyroscope changes
     @Override
     public void onGyroscopeActivated() {
         uiController.onGyroscopeActivated();
@@ -87,16 +93,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onGyroscopeChanged(float[] values) {
+        mp.start();
         uiController.onGyroscopeChanged(values);
+
     }
 
-    // Gyroscope sensor chip click handler
     public void onActivateGyroscopeChipClick(View view) {
         toggleGyroscopeSensor();
-    }
-
-    // Accelerometer sensor chip click handler
-    public void onActivateAccelerometerChipClick(View view) {
-        toggleAccelerometerSensor();
     }
 }

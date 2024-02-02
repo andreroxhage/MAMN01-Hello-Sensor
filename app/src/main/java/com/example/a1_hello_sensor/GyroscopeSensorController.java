@@ -1,13 +1,10 @@
 package com.example.a1_hello_sensor;
 
 import android.hardware.SensorEventListener;
-
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Vibrator;
 
 public class GyroscopeSensorController implements SensorEventListener {
 

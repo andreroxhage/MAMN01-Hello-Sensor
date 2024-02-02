@@ -10,7 +10,6 @@ public class FlashlightController {
     private String cameraId;
     private boolean isFlashlightOn = false;
 
-
     public FlashlightController(Context context) {
         cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         try {
